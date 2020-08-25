@@ -1,5 +1,7 @@
 package br.com.softblue.bluefood.infrastructure.web.controller;
 
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,7 +47,7 @@ public class CarrinhoController {
 			@ModelAttribute("carrinho") Carrinho carrinho,
 			Model model) {
 		
-		ItemCardapio itemCardapio = itemCardapioRepository.findById(itemId).orElseThrow();
+		ItemCardapio itemCardapio = itemCardapioRepository.findById(itemId).orElseThrow(NoSuchElementException::new);
 		
 		try {
 			carrinho.adicionarItem(itemCardapio, quantidade, observacoes);
@@ -68,7 +70,7 @@ public class CarrinhoController {
 			SessionStatus sessionStatus,
 			Model model) {
 		
-		ItemCardapio itemCardapio = itemCardapioRepository.findById(itemId).orElseThrow();
+		ItemCardapio itemCardapio = itemCardapioRepository.findById(itemId).orElseThrow(NoSuchElementException::new);
 		carrinho.removerItem(itemCardapio);
 		
 		if (carrinho.vazio()) {
@@ -84,7 +86,7 @@ public class CarrinhoController {
 			@ModelAttribute("carrinho") Carrinho carrinho,
 			Model model) {
 		
-		Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow();
+		Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(NoSuchElementException::new);
 		
 		carrinho.limpar();
 		

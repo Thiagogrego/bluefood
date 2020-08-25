@@ -39,23 +39,23 @@ import lombok.ToString;
 @Table(name = "restaurante")
 public class Restaurante extends Usuario {
 	
-	@NotBlank(message = "O CNPJ não pode ser vazio")
-	@Pattern(regexp = "[0-9]{14}", message = "O CNPJ possui formato inválido")
+	@NotBlank(message = "O CNPJ nÃ£o pode ser vazio")
+	@Pattern(regexp = "[0-9]{14}", message = "O CNPJ possui formato invÃ¡lido")
 	@Column(length = 14, nullable = false)
 	private String cnpj;
 	
 	@Size(max = 80)
 	private String logotipo;
 	
-	@UploadConstraint(acceptedTypes = FileType.PNG, message = "O arquivo não é um arquivo de imagem válido")
+	@UploadConstraint(acceptedTypes = FileType.PNG, message = "O arquivo nÃ£o Ã© um arquivo de imagem vÃ¡lido")
 	private transient MultipartFile logotipoFile;
 	
-	@NotNull(message = "A taxa de entrega não ser ser vazia")
+	@NotNull(message = "A taxa de entrega nÃ£o pode ser ser vazia")
 	@Min(0)
 	@Max(99)
 	private BigDecimal taxaEntrega;
 	
-	@NotNull(message = "O tempo de entrega não ser ser vazio")
+	@NotNull(message = "O tempo de entrega nÃ£o pode ser ser vazio")
 	@Min(0)
 	@Max(120)
 	private Integer tempoEntregaBase;
@@ -78,7 +78,7 @@ public class Restaurante extends Usuario {
 	
 	public void setLogotipoFileName() {
 		if (getId() == null) {
-			throw new IllegalStateException("É preciso primeiro gravar o registro");
+			throw new IllegalStateException(" Ã‰ preciso primeiro gravar o registro");
 		}
 		
 		this.logotipo = String.format("%04d -logo.%s", getId(), FileType.of(logotipoFile.getContentType()).getExtension());
@@ -95,5 +95,20 @@ public class Restaurante extends Usuario {
 	}
 	
 	
+	
+	public Integer calcularTempoEntrega(String cep) {
+		int soma = 0;
+		
+		for (char c : cep.toCharArray() ) {
+			int v = Character.getNumericValue(c);
+			if(v>0) {
+				soma += v;
+			}
+		}
+		
+		soma /= 2;
+		
+		return tempoEntregaBase + soma;
+	}
 	
 }

@@ -2,6 +2,7 @@ package br.com.softblue.bluefood.application.service;
 
 
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.softblue.bluefood.domain.cliente.Cliente;
 import br.com.softblue.bluefood.domain.cliente.ClienteRepository;
+import br.com.softblue.bluefood.domain.restaurante.ItemCardapio;
+import br.com.softblue.bluefood.domain.restaurante.ItemCardapioRepository;
 import br.com.softblue.bluefood.domain.restaurante.Restaurante;
+import br.com.softblue.bluefood.domain.restaurante.RestauranteComparator;
 import br.com.softblue.bluefood.domain.restaurante.RestauranteRepository;
 import br.com.softblue.bluefood.domain.restaurante.SearchFilter;
 import br.com.softblue.bluefood.domain.restaurante.SearchFilter.SearchType;
+import br.com.softblue.bluefood.util.SecurityUtils;
 
 @Service
 public class RestauranteService {
@@ -24,6 +29,8 @@ public class RestauranteService {
 	@Autowired
 	private ClienteRepository clienteRepository;
 
+	@Autowired
+	private ItemCardapioRepository itemCardapioRepository;
 	
 	@Autowired
 	private ImageService imageService;
@@ -32,12 +39,14 @@ public class RestauranteService {
 	public void saveRestaurante(Restaurante restaurante) throws ValidationException {
 		
 		if(!validateEmail(restaurante.getEmail(), restaurante.getId())){
-			throw new ValidationException("O email est· duplicado");
+			throw new ValidationException("O email est√° duplicado");
 		}
 			
 		if (restaurante.getId() != null) {
 			Restaurante restauranteDB = restauranteRepository.findById(restaurante.getId()).orElseThrow();
 			restaurante.setSenha(restauranteDB.getSenha());
+			restaurante.setLogotipo(restauranteDB.getLogotipo());
+			restauranteRepository.save(restaurante);
 		
 		} else {
 			restaurante.encryptPassWord();
@@ -82,11 +91,34 @@ public class RestauranteService {
 			restaurantes = restauranteRepository.findByCategorias_Id(filter.getCategoriaId());
 			
 		} else {
-			throw new IllegalStateException("O tipo de busca" + filter.getSearchType() + "n„o È suportado");
+			throw new IllegalStateException("O tipo de busca" + filter.getSearchType() + "n√£o √© suportado");
+		}
+		
+		Iterator<Restaurante> it = restaurantes.iterator();
+		
+		while (it.hasNext()) {
+			Restaurante restaurante = it.next();
+			double taxaEntrega = restaurante.getTaxaEntrega().doubleValue();
+			
+			if (filter.isEntregaGratis() && taxaEntrega > 0 || !filter.isEntregaGratis() && taxaEntrega == 0 ) {
+				it.remove();
+			}
+		
 		}
 		
 		
+		RestauranteComparator comparator = new RestauranteComparator(filter, SecurityUtils.loggedCliente().getCep());
+		restaurantes.sort(comparator);
+		
 		return restaurantes;
+	
+	}
+	
+	@Transactional
+	public void saveItemItemCardapio(ItemCardapio itemCardapio) {
+		itemCardapio = itemCardapioRepository.save(itemCardapio);
+		itemCardapio.setImagemFileName();
+		imageService.UploadComida(itemCardapio.getImagemFile(), itemCardapio.getImagem());
 	}
 		
 }

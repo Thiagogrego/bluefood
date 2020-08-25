@@ -9,9 +9,9 @@
 				
 				<div id="mensagemDeSucesso" th:if="${msg != null}">
 					<span th:text="${msg}"></span>
-				</div><br>
+				</div><br />
 				
-				<form method="post" th:object=${cliente} th:action="${!editMode} ? @{/public/cliente/save} : @{/cliente/save}">
+				<form method="post" th:object="${cliente}" th:action="${!editMode} ? @{/public/cliente/save} : @{/cliente/save}">
 					<fieldset>
 						<input type="hidden" th:field="*{id}"/>
 						
@@ -62,9 +62,9 @@
 				</form>
 				<br>
 				
-				<input type="button" value="Voltar" th:onClick="'location.href=\'' + @{/cliente/home} + '\';'"/>
+				<input type="button" value="Voltar" th:onclick="'location.href=\'' + @{/cliente/home} + '\';'" />
 			</div>
-		</div>
+		</div> 
 		
 	</body>
 </html>

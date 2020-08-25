@@ -24,7 +24,7 @@ public class ClienteService {
 	public void saveCliente(Cliente cliente) throws ValidationException {
 		
 		if(!validateEmail(cliente.getEmail(), cliente.getId())){
-			throw new ValidationException("O email est· duplicado");
+			throw new ValidationException("O email est√° duplicado");
 		}
 		
 		if (cliente.getId() != null) {
